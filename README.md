@@ -1,2 +1,3 @@
-# johnharby-autonomic.github.io
-Website repository for Autonomic AI
+# Autonomic AI 
+Accurate, auditable and sustainable AI for a better tomorrow
+We don't just auto-generate, we auto-evolve as well and in a fully governed approach
