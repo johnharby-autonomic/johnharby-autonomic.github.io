@@ -21,3 +21,16 @@ dependencies, no tracking. One shared stylesheet (styles.css) drives every page.
 These two pages are linked in the nav/footer but were not in the upload set,
 so their links will 404 until added: benchmark.html, customers.html.
 Send those two saved pages and they drop straight in.
+
+DOMAIN 
+
+In your repo on GitHub: **Settings > Pages**, then the **"Custom domain"** field. Type `functormodel.ai`, click **Save**. After it verifies, check **Enforce HTTPS**.
+
+That save also commits a `CNAME` file to your repo root, so don't be surprised when it appears.
+
+Then set DNS at your domain registrar so the domain points to GitHub:
+
+- For the apex `functormodel.ai`: four **A** records to GitHub's Pages IPs: `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`.
+- For `www.functormodel.ai`: one **CNAME** record pointing to `johnharby-autonomic.github.io`.
+
+DNS can take a little while to propagate. Once it resolves, GitHub issues the HTTPS certificate automatically, then you can tick Enforce HTTPS. If those exact IPs matter to you, confirm them on GitHub's Pages docs, since they publish the current set.

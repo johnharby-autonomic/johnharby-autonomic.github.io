@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Benchmark | Autonomic AI, LLC</title>
+<meta content="Functor model editing vs. online SGD: an energy and correctness benchmark for the functor ResNet, measured on bare metal." name="description"/>
+<link href="styles.css" rel="stylesheet"/>
+<style>
+  .benchmark{--muted:#6b7480;--font-mono:ui-monospace,SFMono-Regular,Menlo,monospace;}
+  .benchmark table{border-collapse:collapse;width:100%;margin:1.2em 0;font-size:.95rem}
+  .benchmark th,.benchmark td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+  .benchmark th{background:var(--bg-alt);font-weight:600;color:var(--ink)}
+  .benchmark h2{margin-top:1.8em}
+</style>
+</head>
+<body>
+<header class="site-header">
+<div class="wrap nav">
+<a class="brand" href="index.html">Autonomic AI</a>
+<button aria-label="Menu" class="nav-toggle" onclick="document.getElementById('nav').classList.toggle('open')">☰</button>
+<nav class="nav-links" id="nav">
+<a href="index.html">Home</a>
+<a href="about.html">About</a>
+<a href="capabilities.html">Capabilities</a>
+<a href="assured.html">AssuredCode</a>
+<a href="functor.html">Functor Models</a>
+<a href="lop.html">LOP</a>
+<a href="customers.html">Customers</a>
+</nav>
+</div>
+</header>
+<section class="hero">
+<div class="wrap">
+<p class="eyebrow">Benchmark</p>
+<h1>Functor Model Editing vs. Online SGD</h1>
+<p class="lead">Energy and correctness benchmark for the functor ResNet, measured on bare metal.</p>
+</div>
+</section>
+<section class="content">
+<div class="wrap">
+<div class="prose benchmark">
+<header class="report-head fade-in">
+<p class="eyebrow">Bare-metal benchmark report · IBM Cloud, dual-socket Sapphire Rapids</p>
+<h2>Exact model editing beats gradient correction on both correctness and energy</h2>
+<p class="subhead">A functor-style, one-shot direct-sum edit mechanism is compared against conventional per-example online SGD for fixing a trained classifier's mistakes — measured for correction success, collateral damage to unrelated predictions, and energy cost via Intel RAPL, cross-validated against the server's BMC power telemetry.</p>
+<dl class="spec-grid">
+<div><dt>Hardware</dt><dd>Lenovo SR650 V3</dd></div>
+<div><dt>CPU</dt><dd>2× Xeon Gold 6434H</dd></div>
+<div><dt>Cores / threads</dt><dd>16C / 32T</dd></div>
+<div><dt>Memory</dt><dd>512 GB DDR5 ECC</dd></div>
+<div><dt>Accelerator</dt><dd>AMX bf16 (no GPU)</dd></div>
+<div><dt>OS</dt><dd>Ubuntu 24.04.4 LTS</dd></div>
+<div><dt>Model</dt><dd>ResNet‑18, from scratch</dd></div>
+<div><dt>Dataset</dt><dd>Imagenette2 (10‑class)</dd></div>
+</dl>
+</header>
+<section id="headline">
+<div class="section-label"><span class="num">01</span><h2>Headline result</h2></div>
+<p>Both mechanisms received the identical task, repeated across five independent trials of 150 randomly-sampled misclassified images each, drawn from the same frozen 89.40%-accurate checkpoint: <em>make the model get this specific example right, right now, without retraining from scratch.</em></p>
+<div class="stat-row">
+<div class="stat">
+<div class="label">Correction success rate</div>
+<div class="compare">
+<span class="fig functor">100.0%</span>
+<span class="vs">vs</span>
+<span class="fig baseline">18.9%</span>
+</div>
+</div>
+<div class="stat">
+<div class="label">Collateral accuracy loss</div>
+<div class="compare">
+<span class="fig functor">0.0%</span>
+<span class="vs">vs</span>
+<span class="fig baseline">12.9%</span>
+</div>
+</div>
+<div class="stat">
+<div class="label">Energy / successful fix</div>
+<div class="compare">
+<span class="fig functor">4.56 J</span>
+<span class="vs">vs</span>
+<span class="fig baseline">15.80 J</span>
+</div>
+</div>
+</div>
+<p><span class="swatch functor"></span>Functor (direct-sum commit) figures are exact, zero-variance results, not statistical estimates that happened to land favorably — they follow from the mechanism's construction (below), not from luck across these five trials. <span class="swatch baseline"></span>Baseline (online SGD) figures are the best the conventional approach could do: its learning rate was swept over three orders of magnitude and selected specifically to maximize its own success rate before this comparison was run.</p>
+</section>
+<section id="mechanism">
+<div class="section-label"><span class="num">02</span><h2>Why functor edits are exact</h2></div>
+<p>The functor path wraps a frozen base model <code>f</code> in a hash-keyed override table. A correction commits as an exact direct sum:</p>
+<p style="font-family: var(--font-mono); font-size: 1.05rem; padding: 0.9rem 1.1rem; background: var(--paper-raised); border: 1px solid var(--line);">f<sub>new</sub>(x) = f<sub>old</sub>(x) + Δf(x)</p>
+<p>applied only where the gate fires — an exact-match hash of the input, not a distance-decayed kernel. An earlier design used a soft RBF gate that blended corrections into nearby-but-different inputs; that was deliberately removed, because interpolation breaks the guarantee this benchmark depends on. With a binary exact-match gate, every commit is provably local: it can only ever change the output for the one input it was anchored to, never for anything else. That is why the collateral-drift column reads exactly <strong>0.0%</strong> rather than merely low — it is not measured, it is structural.</p>
+<p>The baseline path instead applies one online SGD step (forward + backward + optimizer update) directly to the model's weights for each correction — the conventional way to "teach" a network a new fact. Because weights are shared across every input, a step that nudges the model toward one correct answer also perturbs its behavior everywhere else, which is exactly the collateral effect measured below.</p>
+</section>
+<section id="hunt">
+<div class="section-label"><span class="num">03</span><h2>The training bug that had to be found first</h2></div>
+<p>Before any correction could be benchmarked, the base ResNet-18 needed a real, honestly-trained checkpoint. The first several training attempts diverged after epoch 0 — loss exploding 30–50×, validation accuracy pinned at exactly chance regardless of what changed. Six controlled A/B diagnostics isolated the cause:</p>
+<ol class="hunt">
+<li>LR warmup schedule — removed, divergence persisted</li>
+<li>bf16 autocast precision itself — isolated via fp32 control, ruled out</li>
+<li>Gradient clipping — removed, divergence persisted identically</li>
+<li>Eval/train mode switching (BatchNorm) — isolated, output stayed healthy</li>
+<li>DataLoader worker respawn per epoch — disabled, divergence persisted</li>
+<li>Corrupt training images — full 9,469-image scan, none found</li>
+<li class="hit"><strong>Root cause:</strong> <code>torch.autocast()</code> wrapped around an entire epoch's training loop let CPU autocast serve a <em>stale, cached bf16 cast</em> of the model's weights after <code>optimizer.step()</code> had already updated them — silently decoupling what was being trained from what was being computed, for every step after the first.</li>
+</ol>
+<div class="callout good">
+<span class="tag">Fix &amp; validation</span>
+<p>Entering the autocast context fresh on every step (not once per epoch) resolved it completely: 82% validation accuracy in 8 epochs post-fix, versus chance-level accuracy in every pre-fix variant regardless of hyperparameters. The full 60-epoch run then reached <strong>89.40%</strong> validation accuracy cleanly, with no further intervention.</p>
+</div>
+</section>
+<section id="protocol">
+<div class="section-label"><span class="num">04</span><h2>Protocol</h2></div>
+<ol>
+<li><strong>Base model.</strong> ResNet-18, random initialization, trained 60 epochs on Imagenette2 (9,469 train / 3,925 val images, 224×224), SGD (momentum 0.9, nesterov, cosine LR decay from 0.025, no warmup — unnecessary at batch 64), bf16 autocast via AMX. Best checkpoint: <strong>89.40%</strong> validation accuracy, 416 of 3,925 validation images misclassified.</li>
+<li><strong>Correction pool.</strong> All 416 misclassified images, each paired with its true label, form the pool both arms draw from.</li>
+<li><strong>Baseline LR selection.</strong> Swept <span class="mono">1×10⁻⁵ – 3×10⁻²</span> (8 points, log-spaced) on a 200-example pilot set. Selection rule fixed in advance: highest fix rate first, then lowest energy among near-ties. <span class="mono">lr=3×10⁻⁵</span> won outright (35% fix rate on the pilot set — notably higher than its 18.9% mean across the resampled trials below, itself evidence for why repeated trials matter over a single point estimate).</li>
+<li><strong>Repeated trials.</strong> 5 independent trials; each draws 150 examples at random from the 416-image pool and runs <em>both</em> arms on the identical subset, from the identical frozen checkpoint, back to back.</li>
+<li><strong>Energy measurement.</strong> Intel RAPL, both CPU package domains, read in batches of 10 corrections (individual commits are sub-millisecond — below RAPL's useful measurement granularity). Idle baseline (135.18 W, averaged over 3 independent measurements) is subtracted to isolate marginal energy.</li>
+</ol>
+</section>
+<section id="results">
+<div class="section-label"><span class="num">05</span><h2>Results</h2></div>
+<p>Mean ± standard deviation across N=5 trials; 95% CI in parentheses (normal approximation — indicative at this N, not exact).</p>
+<div class="table-wrap">
+<table>
+<caption>Repeated-trial summary, 150 corrections per trial</caption>
+<thead>
+<tr>
+<th>Arm</th>
+<th class="num">Fix rate</th>
+<th class="num">Collateral drift</th>
+<th class="num">J / correction</th>
+<th class="num">J / successful fix</th>
+<th class="num">Seconds / 150</th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-functor">
+<td class="rowlabel"><span class="swatch functor"></span>Functor</td>
+<td class="num">100.0% <span class="mono" style="color:var(--muted)">(±0.0)</span></td>
+<td class="num">0.0% <span class="mono" style="color:var(--muted)">(±0.0)</span></td>
+<td class="num">4.56 <span class="mono" style="color:var(--muted)">(±0.06)</span></td>
+<td class="num">4.56 <span class="mono" style="color:var(--muted)">(±0.06)</span></td>
+<td class="num">5.61 <span class="mono" style="color:var(--muted)">(±0.13)</span></td>
+</tr>
+<tr class="row-baseline">
+<td class="rowlabel"><span class="swatch baseline"></span>Baseline (lr=3e‑5)</td>
+<td class="num">18.9% <span class="mono" style="color:var(--muted)">(±2.3)</span></td>
+<td class="num">12.9% <span class="mono" style="color:var(--muted)">(±3.1)</span></td>
+<td class="num">2.94 <span class="mono" style="color:var(--muted)">(±0.03)</span></td>
+<td class="num">15.80 <span class="mono" style="color:var(--muted)">(±2.34)</span></td>
+<td class="num">3.04 <span class="mono" style="color:var(--muted)">(±0.02)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The raw per-operation energy is <em>not</em> where functor wins — at 2.94J, a single baseline SGD step is actually cheaper than a single functor commit's 4.56J, because a commit's validation pass evaluates the base model at several nearby points before accepting the edit. The gap opens entirely on <em>outcome</em>: baseline spends its energy on corrections that mostly don't stick, so its cost per correction that actually lands is 3.5× higher — before even accounting for the damage those steps do elsewhere.</p>
+<div class="callout warn">
+<span class="tag">On the baseline's collateral damage</span>
+<p>Every baseline trial started from a control set of 200 validation images the model already classified correctly. After 150 single-example SGD corrections elsewhere, an average of 12.9% of that unrelated, previously-correct control set flipped to wrong — at the LR chosen specifically to <em>maximize</em> the baseline's own success rate. Higher learning rates tested in the sweep were worse on both axes simultaneously: from lr ≥ 1×10⁻³ the model collapsed to an identical degenerate state regardless of exact LR (20/200 fixed, 89% collateral loss, unchanged across a 30× LR range) — a distinct representation-collapse failure mode, not the autocast bug from Section 3.</p>
+</div>
+</section>
+<section id="crosscheck">
+<div class="section-label"><span class="num">06</span><h2>Independent power cross-check</h2></div>
+<p>RAPL measures CPU package energy only. To check it against an independent instrument, the server's Lenovo XClarity BMC was queried in-band via IPMI (no separate management-network credentials required).</p>
+<div class="table-wrap">
+<table>
+<caption>Idle-state cross-validation</caption>
+<thead>
+<tr><th>Source</th><th class="num">Reading</th></tr>
+</thead>
+<tbody>
+<tr><td>RAPL, CPU package (this benchmark's instrument)</td><td class="num">139.5 W</td></tr>
+<tr><td>IPMI, "CPU Power" sensor (independent instrument)</td><td class="num">140 W</td></tr>
+<tr><td>IPMI, "Sys Power" (whole chassis: PSU, fans, NICs, drives)</td><td class="num">264 W</td></tr>
+</tbody>
+</table>
+</div>
+<p>The two independent CPU-power instruments agree to within 1 W at idle — the RAPL numbers this report is built on are not just internally consistent, they match a second, independently-calibrated sensor. The ~124 W gap between CPU package power and whole-chassis power is real, constant non-CPU overhead on this dual-PSU enterprise server; it does not affect the functor-vs-baseline comparison (identical hardware, identical constant overhead, in both arms), but it does mean RAPL alone understates <em>total facility-level</em> draw for anyone costing this at the wall.</p>
+<div class="callout warn">
+<span class="tag">A limitation, reported rather than hidden</span>
+<p>Under sustained synthetic CPU load, RAPL correctly tracked the increase (139 W idle → 293–301 W loaded, confirmed over two independent windows up to 45 seconds). The BMC's IPMI DCMI power-reading command did not: across 14 samples spanning 42 seconds of continuous load, it stayed flat at 269–271 W — indistinguishable from idle. This is a genuine limitation of that specific telemetry path on this BMC firmware under CPU-only load, not a transient lag; further sampling would not have resolved it. The idle cross-validation stands as confirmation of RAPL's accuracy; the load-condition figures in Section 5 rely on RAPL alone.</p>
+</div>
+</section>
+<section id="limits">
+<div class="section-label"><span class="num">07</span><h2>Scope &amp; limitations</h2></div>
+<ul>
+<li><strong>Dataset scale.</strong> Imagenette (10-class, 13k images), not full ImageNet-1k — chosen deliberately to prioritize repeated-trial statistical rigor over one long training run inside a fixed 3-week compute window. Architecture (ResNet-18) is unmodified and standard.</li>
+<li><strong>Baseline design.</strong> One online SGD step per correction, matching the functor path's one-commit-per-correction granularity for a direct comparison. A periodic-batch retraining baseline would trade a different set of costs and is not covered here.</li>
+<li><strong>Energy granularity.</strong> RAPL readings are batched over groups of 10 corrections, not individual commits, to stay above counter measurement noise — appropriate for the means reported here, not for single-correction-level claims.</li>
+<li><strong>Hardware generality.</strong> All figures are specific to this Sapphire Rapids / AMX configuration; both arms were measured on identical hardware, so the <em>relative</em> comparison should generalize better than either arm's absolute numbers.</li>
+</ul>
+</section>
+<footer>
+<p>Base checkpoint <span class="mono">resnet18_base.pt</span> · 89.40% val. accuracy, epoch 58/60 · artifacts frozen post-XCC-validation, no further methodology or model changes.</p>
+</footer>
+</div>
+</div>
+</section>
+<footer class="site-footer">
+<div class="wrap">
+<div class="foot-grid">
+<div>
+<h4>Autonomic AI, LLC</h4>
+<p>Microsoft and IBM Partner. Enterprise and research-focused software. No sale of personal information.</p>
+<p class="badge-line">Formally verified in Lean 4 ✓   Published on Zenodo ✓</p>
+<p class="badge-line">UEI: YAYREBPA5DP8   CAGE: 202Z5   Registered in SAM.gov</p>
+</div>
+<div>
+<h4>Products</h4>
+<div class="foot-links">
+<a href="assured.html">AssuredCode</a>
+<a href="assuredcode-c.html">AssuredCode-C</a>
+<a href="assuredprocess.html">AssuredProcess</a>
+<a href="assured-test.html">AssuredTest</a>
+<a href="lop.html">LOP</a>
+<a href="autonomous-systems.html">Autonomous Support</a>
+</div>
+</div>
+<div>
+<h4>Company</h4>
+<div class="foot-links">
+<a href="about.html">About</a>
+<a href="capabilities.html">Capabilities</a>
+<a href="functor.html">Functor Models</a>
+<a href="customers.html">Customers</a>
+<a href="projects.html">Projects</a>
+<a href="press-release.html">Press</a>
+<a href="terms.html">Terms</a>
+<a href="privacy.html">Privacy</a>
+</div>
+</div>
+</div>
+<div class="foot-bottom">© 2026 Autonomic AI, LLC. All rights reserved.</div>
+</div>
+</footer>
+</body>
+</html>

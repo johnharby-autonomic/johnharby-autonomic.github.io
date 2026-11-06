@@ -1,191 +1,515 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AssuredCode | Autonomic AI, LLC</title>
-<meta name="description" content="Safe, deterministic software generation, governance and assurance. Reproducible, specification-driven code generation for regulated environments.">
-<link rel="stylesheet" href="styles.css">
+<title>AssuredCode™ — Autonomic AI, LLC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#080B14;
+    --ink-2:#0D1220;
+    --panel:#141A2B;
+    --panel-2:#1B2236;
+    --line:rgba(198,161,91,.18);
+    --line-soft:rgba(255,255,255,.06);
+    --bone:#ECE7DA;
+    --bone-panel:#E4DECF;
+    --gold:#C6A15B;
+    --gold-bright:#E0BE7B;
+    --verify:#5FBE93;
+    --text:#E9EBF0;
+    --muted:#8D97AD;
+    --muted-2:#5E6880;
+    --serif:"Fraunces",Georgia,serif;
+    --sans:"Inter",system-ui,sans-serif;
+    --mono:"JetBrains Mono",ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--ink);
+    color:var(--text);
+    font-family:var(--sans);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 32px}
+  .mono{font-family:var(--mono)}
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:var(--gold);
+    display:inline-block;
+  }
+
+  /* ---- HERO ---- */
+  .hero{position:relative;padding:96px 0 72px;overflow:hidden}
+  .hero::before{
+    content:"";position:absolute;inset:0;
+    background:
+      radial-gradient(1200px 600px at 78% -10%, rgba(198,161,91,.10), transparent 60%),
+      radial-gradient(900px 500px at 0% 20%, rgba(95,190,147,.05), transparent 55%);
+    pointer-events:none;
+  }
+  .grid-bg{
+    position:absolute;inset:0;opacity:.4;pointer-events:none;
+    background-image:linear-gradient(var(--line-soft) 1px,transparent 1px),
+                     linear-gradient(90deg,var(--line-soft) 1px,transparent 1px);
+    background-size:56px 56px;
+    mask-image:linear-gradient(180deg,rgba(0,0,0,.9),transparent 70%);
+  }
+  .hero-grid{position:relative;display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:center}
+  @media(max-width:920px){.hero-grid{grid-template-columns:1fr;gap:44px}}
+  .h1{
+    font-family:var(--serif);
+    font-weight:500;
+    font-size:clamp(40px,6vw,68px);
+    line-height:1.04;
+    letter-spacing:-.015em;
+    margin:22px 0 20px;
+  }
+  .h1 em{font-style:italic;color:var(--gold-bright)}
+  .lede{font-size:18px;color:var(--muted);max-width:42ch;margin-bottom:34px}
+  .cta-row{display:flex;gap:14px;flex-wrap:wrap}
+  .btn{
+    font-family:var(--mono);font-size:13px;letter-spacing:.04em;
+    padding:14px 24px;border:1px solid var(--gold);
+    display:inline-flex;align-items:center;gap:10px;transition:all .2s;cursor:pointer;
+  }
+  .btn.primary{background:var(--gold);color:var(--ink);font-weight:600}
+  .btn.primary:hover{background:var(--gold-bright);transform:translateY(-1px)}
+  .btn.ghost{color:var(--gold);background:transparent}
+  .btn.ghost:hover{background:rgba(198,161,91,.08)}
+
+  /* ---- DETERMINISM SEAL (signature) ---- */
+  .seal{
+    background:linear-gradient(160deg,var(--panel),var(--ink-2));
+    border:1px solid var(--line);
+    padding:26px;position:relative;
+    box-shadow:0 40px 80px -40px rgba(0,0,0,.8);
+  }
+  .seal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+  .seal-title{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase}
+  .seal-dot{width:8px;height:8px;border-radius:50%;background:var(--verify);box-shadow:0 0 12px var(--verify)}
+  .spec-line{font-family:var(--mono);font-size:12.5px;color:var(--muted-2);margin-bottom:4px}
+  .spec-line b{color:var(--bone)}
+  .runs{margin-top:20px;border-top:1px solid var(--line-soft);padding-top:18px}
+  .run{display:flex;align-items:center;gap:12px;font-family:var(--mono);font-size:12.5px;padding:7px 0;opacity:0;transform:translateY(6px)}
+  .run.show{opacity:1;transform:none;transition:all .5s}
+  .run .idx{color:var(--muted-2);width:52px}
+  .run .arrow{color:var(--gold)}
+  .run .hash{color:var(--gold-bright);letter-spacing:.02em}
+  .run .tick{margin-left:auto;color:var(--verify);font-weight:600}
+  .seal-foot{
+    margin-top:18px;padding-top:16px;border-top:1px solid var(--line-soft);
+    font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:var(--muted);
+    display:flex;align-items:center;gap:8px;
+  }
+  .seal-foot b{color:var(--verify)}
+
+  /* ---- CREDENTIAL BAR ---- */
+  .creds{border-top:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft);background:var(--ink-2)}
+  .creds-in{display:flex;flex-wrap:wrap;gap:14px 36px;padding:22px 0;font-family:var(--mono);font-size:12px;letter-spacing:.06em}
+  .cred{color:var(--muted);white-space:nowrap}
+  .cred b{color:var(--bone)}
+  .cred .k{color:var(--gold)}
+
+  /* ---- SECTIONS ---- */
+  section.block{padding:88px 0}
+  .sec-head{max-width:60ch;margin-bottom:48px}
+  .sec-head h2{font-family:var(--serif);font-weight:500;font-size:clamp(28px,4vw,40px);line-height:1.1;letter-spacing:-.01em;margin:14px 0 16px}
+  .sec-head p{color:var(--muted);font-size:17px}
+
+  /* procedure (two-layer: operator steps + assessor assurance notes) */
+  .proc-toolbar{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:36px;
+    padding:16px 20px;border:1px solid var(--line-soft);background:var(--ink-2)}
+  .proc-toolbar .tb-label{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .toggle{display:inline-flex;border:1px solid var(--line);background:var(--ink);padding:3px}
+  .toggle button{font-family:var(--mono);font-size:12px;letter-spacing:.04em;color:var(--muted);
+    background:none;border:none;padding:8px 16px;cursor:pointer;transition:all .2s}
+  .toggle button.on{background:var(--gold);color:var(--ink);font-weight:600}
+  .toggle button:not(.on):hover{color:var(--gold-bright)}
+  .tb-hint{font-family:var(--sans);font-size:13px;color:var(--muted-2);margin-left:auto}
+  @media(max-width:640px){.tb-hint{margin-left:0;flex-basis:100%}}
+
+  .phase{margin-bottom:14px;border:1px solid var(--line-soft);background:var(--panel)}
+  .phase-head{display:flex;align-items:baseline;gap:16px;padding:20px 24px;border-bottom:1px solid var(--line-soft)}
+  .phase-head .pnum{font-family:var(--mono);font-size:12px;color:var(--gold);letter-spacing:.1em}
+  .phase-head h3{font-family:var(--serif);font-size:22px;font-weight:500}
+  .phase-head .when{font-family:var(--mono);font-size:11px;color:var(--muted-2);text-transform:uppercase;letter-spacing:.12em;margin-left:auto}
+  @media(max-width:560px){.phase-head{flex-wrap:wrap}.phase-head .when{margin-left:0;flex-basis:100%}}
+
+  .step{border-bottom:1px solid var(--line-soft)}
+  .step:last-child{border-bottom:none}
+  .step-line{display:flex;gap:16px;align-items:baseline;padding:16px 24px}
+  .step-line .sidx{font-family:var(--mono);font-size:12px;color:var(--muted-2);flex:none;width:34px}
+  .step-line .saction{font-size:15.5px;color:var(--text);font-weight:500}
+  .assurance{
+    margin:0 24px 0 74px;overflow:hidden;max-height:0;opacity:0;
+    transition:max-height .3s ease,opacity .3s ease,margin-bottom .3s ease;
+    border-left:2px solid var(--line);
+  }
+  .assurance-in{padding:2px 0 16px 16px}
+  .assurance .arow{font-size:13.5px;color:var(--muted);margin-top:8px;line-height:1.5}
+  .assurance .arow b{color:var(--bone);font-weight:500}
+  .assurance .evidence{font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--gold);
+    display:inline-flex;align-items:center;gap:7px;margin-top:10px}
+  .assurance .evidence::before{content:"◆";font-size:9px}
+  .proc.show-assurance .assurance{max-height:340px;opacity:1;margin-bottom:6px}
+
+  /* the deployment gate — hard stop, given visual weight */
+  .gate{background:linear-gradient(160deg,rgba(198,161,91,.08),transparent);border:1px solid var(--line);
+    margin:16px 24px 20px;padding:18px 22px;display:flex;gap:16px;align-items:flex-start}
+  .gate .gicon{font-family:var(--mono);color:var(--gold);font-size:18px;flex:none;line-height:1.3}
+  .gate .gbody b{color:var(--gold-bright);font-family:var(--serif);font-size:16px;font-weight:500;display:block;margin-bottom:3px}
+  .gate .gbody p{font-size:14px;color:var(--muted)}
+
+  /* determinism callout */
+  .determ{background:var(--bone);color:#1B1B1B}
+  .determ .eyebrow{color:#9A7B34}
+  .determ h2{font-family:var(--serif);font-weight:500;font-size:clamp(30px,4.5vw,46px);line-height:1.06;letter-spacing:-.015em;margin:16px 0 22px;color:#12151F}
+  .determ h2 em{font-style:italic;color:#8A6B26}
+  .determ p{color:#4A4E58;font-size:17px;max-width:60ch}
+  .determ .contrast{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-top:44px;border:1px solid rgba(0,0,0,.12)}
+  @media(max-width:720px){.determ .contrast{grid-template-columns:1fr}}
+  .contrast > div{padding:28px}
+  .contrast .bad{background:rgba(0,0,0,.03);border-right:1px solid rgba(0,0,0,.1)}
+  @media(max-width:720px){.contrast .bad{border-right:none;border-bottom:1px solid rgba(0,0,0,.1)}}
+  .contrast .label{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:14px}
+  .contrast .bad .label{color:#A24A3C}
+  .contrast .good .label{color:#5E7A3E}
+  .contrast .big{font-family:var(--serif);font-size:20px;color:#12151F;margin-bottom:8px}
+  .contrast .sub{font-size:14px;color:#5A5E68}
+
+  /* capabilities grid */
+  .cap-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line-soft);border:1px solid var(--line-soft)}
+  @media(max-width:720px){.cap-grid{grid-template-columns:1fr}}
+  .cap{background:var(--ink);padding:34px;transition:background .25s}
+  .cap:hover{background:var(--panel)}
+  .cap .n{font-family:var(--mono);font-size:12px;color:var(--gold);letter-spacing:.1em}
+  .cap h3{font-family:var(--serif);font-size:22px;font-weight:500;margin:14px 0 10px}
+  .cap p{color:var(--muted);font-size:15px}
+
+  /* benchmark readout */
+  .bench{background:var(--ink-2)}
+  .readout{
+    background:linear-gradient(160deg,var(--panel),var(--ink));
+    border:1px solid var(--line);padding:8px;
+  }
+  .readout-bar{
+    font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--muted);
+    padding:14px 20px;border-bottom:1px solid var(--line-soft);
+    display:flex;justify-content:space-between;align-items:center;text-transform:uppercase;
+  }
+  .readout-bar b{color:var(--verify)}
+  .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line-soft)}
+  @media(max-width:820px){.metrics{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:460px){.metrics{grid-template-columns:1fr}}
+  .metric{background:var(--ink);padding:30px 24px}
+  .metric .v{font-family:var(--serif);font-size:clamp(30px,4vw,44px);color:var(--gold-bright);line-height:1;letter-spacing:-.01em}
+  .metric .v small{font-size:16px;color:var(--muted);font-family:var(--mono);letter-spacing:0}
+  .metric .l{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-top:12px}
+  .bench-note{margin-top:28px;color:var(--muted);font-size:15px;max-width:70ch}
+  .bench-note b{color:var(--gold-bright)}
+
+  /* two-col lists */
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:48px}
+  @media(max-width:760px){.two{grid-template-columns:1fr;gap:40px}}
+  .list h3{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:22px}
+  .list ul{list-style:none;display:flex;flex-direction:column}
+  .list li{padding:14px 0;border-bottom:1px solid var(--line-soft);font-size:15.5px;color:var(--text);display:flex;gap:14px;align-items:baseline}
+  .list li span{font-family:var(--mono);font-size:11px;color:var(--muted-2)}
+
+  @media (prefers-reduced-motion: reduce){
+    .run{opacity:1;transform:none;transition:none}
+    *{scroll-behavior:auto}
+  }
+</style>
 </head>
 <body>
+<header class="hero">
+  <div class="grid-bg"></div>
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow">AssuredCode™ · Deterministic Assurance Platform</span>
+      <h1 class="h1">Safe, <em>deterministic</em> software generation, governance &amp; assurance.</h1>
+      <p class="lede">AssuredCode transforms formal specifications into production-ready software artifacts with full traceability, auditability, and governance — built for environments where consistency and accountability are non-negotiable.</p>
+      <div class="cta-row">
+        <a href="#pipeline" class="btn primary">View the AssuredCode process →</a>
+        <a href="#bench" class="btn ghost">See benchmarks</a>
+      </div>
+    </div>
 
-<header class="site-header">
-  <div class="wrap nav">
-    <a class="brand" href="index.html">Autonomic AI</a>
-    <button class="nav-toggle" aria-label="Menu" onclick="document.getElementById('nav').classList.toggle('open')">&#9776;</button>
-    <nav class="nav-links" id="nav">
-      <a href="index.html">Home</a>
-      <a href="about.html">About</a>
-      <a href="capabilities.html">Capabilities</a>
-      <a href="assured.html" class="active">AssuredCode</a>
-      <a href="functor.html">Functor Models</a>
-      <a href="lop.html">LOP</a>
-      <a href="customers.html">Customers</a>
-    </nav>
+    <div class="seal" aria-label="Determinism demonstration">
+      <div class="seal-head">
+        <span class="seal-title">Determinism Verification</span>
+        <span class="seal-dot" title="verified"></span>
+      </div>
+      <div class="spec-line">spec: <b>auth_gateway.v2.formal</b></div>
+      <div class="spec-line">grammar: <b>C · qualified template #A17</b></div>
+      <div class="runs" id="runs">
+        <div class="run"><span class="idx">run 01</span><span class="arrow">⟶</span><span class="hash">0x7F3A…C61E</span><span class="tick">✓ identical</span></div>
+        <div class="run"><span class="idx">run 02</span><span class="arrow">⟶</span><span class="hash">0x7F3A…C61E</span><span class="tick">✓ identical</span></div>
+        <div class="run"><span class="idx">run 03</span><span class="arrow">⟶</span><span class="hash">0x7F3A…C61E</span><span class="tick">✓ identical</span></div>
+      </div>
+      <div class="seal-foot">Same specification <b>→</b> same artifact, every time. Proof obligations discharged in Lean&nbsp;4.</div>
+    </div>
   </div>
 </header>
-
-<section class="hero">
+<section class="block" id="pipeline">
   <div class="wrap">
-    <h1>deterministic</h1>
-    <p class="lead">AssuredCode transforms formal specifications into production-ready software artifacts with full traceability, auditability, and governance, built for environments where consistency and accountability are non-negotiable.</p>
+    <div class="sec-head">
+      <span class="eyebrow">The AssuredCode Process</span>
+      <h2>A procedure you can follow — and evidence you can audit.</h2>
+      <p>Assurance is moved ahead of operational generation: the space from which software can be produced is constrained and qualified first, then verified again at generation and deployment before any artifact becomes operational. Follow the numbered steps to operate the process. Expand assurance detail to see what each step guarantees and how it is evidenced.</p>
+    </div>
+
+    <div class="proc-toolbar">
+      <span class="tb-label">View</span>
+      <div class="toggle" id="procToggle" role="group" aria-label="Detail level">
+        <button class="on" data-mode="operator" aria-pressed="true">Operator checklist</button>
+        <button data-mode="assessor" aria-pressed="false">Assessor detail</button>
+      </div>
+      <span class="tb-hint">Steps are always shown in full. Only the assurance rationale expands.</span>
+    </div>
+
+    <div class="proc" id="proc">
+      <!-- PHASE 1 -->
+      <div class="phase">
+        <div class="phase-head"><span class="pnum">01</span><h3>Design time</h3><span class="when">Before generation</span></div>
+        <div class="step">
+          <div class="step-line"><span class="sidx">1.1</span><span class="saction">Qualify the template against its approved specification.</span></div>
+          <div class="assurance"><div class="assurance-in">
+            <div class="arow">Establishes the <b>bounded space</b> of software that can be produced. Nothing outside a qualified template can be generated.</div>
+            <div class="evidence">Evidence — template qualification record</div>
+          </div></div>
+        </div>
+        <div class="step">
+          <div class="step-line"><span class="sidx">1.2</span><span class="saction">Run combinatorial testing and simulation across the input space.</span></div>
+          <div class="assurance"><div class="assurance-in">
+            <div class="arow">Exercises interactions across parameters before any live generation, surfacing defects at design time rather than in the field.</div>
+            <div class="evidence">Evidence — combinatorial test coverage report</div>
+          </div></div>
+        </div>
+        <div class="step">
+          <div class="step-line"><span class="sidx">1.3</span><span class="saction">Discharge the formal proofs for the template.</span></div>
+          <div class="assurance"><div class="assurance-in">
+            <div class="arow">Correctness properties are proven, not sampled. Proof obligations are <b>discharged in Lean 4</b> and retained.</div>
+            <div class="evidence">Evidence — Lean 4 proof artifacts</div>
+          </div></div>
+        </div>
+      </div>
+
+      <!-- PHASE 2 -->
+      <div class="phase">
+        <div class="phase-head"><span class="pnum">02</span><h3>Generation time</h3><span class="when">At production</span></div>
+        <div class="step">
+          <div class="step-line"><span class="sidx">2.1</span><span class="saction">Normalize and bind the approved specification.</span></div>
+          <div class="assurance"><div class="assurance-in">
+            <div class="arow">The same specification always normalizes to the same bound form — the basis of <b>reproducible output</b>.</div>
+            <div class="evidence">Evidence — normalized spec hash</div>
+          </div></div>
+        </div>
+        <div class="step">
+          <div class="step-line"><span class="sidx">2.2</span><span class="saction">Generate and compile the artifact.</span></div>
+          <div class="assurance"><div class="assurance-in">
+            <div class="arow">Software is produced from a qualified grammar, then compiled — output is code that builds, not a suggestion to review.</div>
+            <div class="evidence">Evidence — build record &amp; artifact hash</div>
+          </div></div>
+        </div>
+        <div class="step">
+          <div class="step-line"><span class="sidx">2.3</span><span class="saction">Run structural and semantic verification, then focused tests.</span></div>
+          <div class="assurance"><div class="assurance-in">
+            <div class="arow">Each artifact is checked against structural and semantic expectations before it is eligible for deployment.</div>
+            <div class="evidence">Evidence — verification &amp; test results</div>
+          </div></div>
+        </div>
+      </div>
+
+      <!-- PHASE 3 -->
+      <div class="phase">
+        <div class="phase-head"><span class="pnum">03</span><h3>Deployment time</h3><span class="when">Before it goes live</span></div>
+        <div class="step">
+          <div class="step-line"><span class="sidx">3.1</span><span class="saction">Run the artifact in shadow execution.</span></div>
+          <div class="assurance"><div class="assurance-in">
+            <div class="arow">Behavior is observed against live conditions with <b>no operational effect</b> before any activation.</div>
+            <div class="evidence">Evidence — shadow execution log</div>
+          </div></div>
+        </div>
+        <div class="step">
+          <div class="step-line"><span class="sidx">3.2</span><span class="saction">Obtain policy and human-in-the-loop approval.</span></div>
+          <div class="assurance"><div class="assurance-in">
+            <div class="arow">Promotion requires explicit policy checks and a human decision — accountability is recorded, not implicit.</div>
+            <div class="evidence">Evidence — approval &amp; policy record</div>
+          </div></div>
+        </div>
+
+        <!-- the gate: hard stop -->
+        <div class="gate">
+          <span class="gicon">◇</span>
+          <div class="gbody">
+            <b>Deployment gate — promotion refused unless obligations are discharged</b>
+            <p>The gate promotes an artifact only when every proof obligation is discharged and every check has passed. Fault injection that leaves an obligation undischarged causes the gate to <b style="color:var(--gold-bright)">refuse promotion</b>. This is the process's hard stop.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-line"><span class="sidx">3.3</span><span class="saction">Activate via blue-green cutover.</span></div>
+          <div class="assurance"><div class="assurance-in">
+            <div class="arow">The new artifact takes traffic only after the gate clears, with the prior version held ready for instant reversion.</div>
+            <div class="evidence">Evidence — deployment receipt</div>
+          </div></div>
+        </div>
+        <div class="step">
+          <div class="step-line"><span class="sidx">3.4</span><span class="saction">Monitor in production; roll back on deviation.</span></div>
+          <div class="assurance"><div class="assurance-in">
+            <div class="arow">Operation is monitored continuously; any deviation triggers reversion to the last known-good version.</div>
+            <div class="evidence">Evidence — monitoring &amp; rollback log</div>
+          </div></div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
-<section class="content">
+<section class="determ block">
   <div class="wrap">
-    <div class="prose">
-      <p>View the AssuredCode process</p>
-      <p>See benchmarks</p>
-      <p>Determinism Verification</p>
-      <p>auth_gateway.v2.formal</p>
-      <p>C, qualified template #A17</p>
-      <p>run 01</p>
-      <p>0x7F3A, C61E</p>
-      <p>identical</p>
-      <p>run 02</p>
-      <p>run 03</p>
-      <p>The AssuredCode Process</p>
-      <h2>A procedure you can follow, and evidence you can audit.</h2>
-      <p>Assurance is moved ahead of operational generation: the space from which software can be produced is constrained and qualified first, then verified again at generation and deployment before any artifact becomes operational. Follow the numbered steps to operate the process. Expand assurance detail to see what each step guarantees and how it is evidenced.</p>
-      <p>View</p>
-      <p>Operator checklist</p>
-      <p>Assessor detail</p>
-      <p>Steps are always shown in full. Only the assurance rationale expands.</p>
-      <p>01</p>
-      <h2>Design time</h2>
-      <p>Before generation</p>
-      <p>1.1</p>
-      <p>Qualify the template against its approved specification.</p>
-      <p>bounded space</p>
-      <p>Evidence, template qualification record</p>
-      <p>1.2</p>
-      <p>Run combinatorial testing and simulation across the input space.</p>
-      <p>Exercises interactions across parameters before any live generation, surfacing defects at design time rather than in the field.</p>
-      <p>Evidence, combinatorial test coverage report</p>
-      <p>1.3</p>
-      <p>Discharge the formal proofs for the template.</p>
-      <p>discharged in Lean 4</p>
-      <p>Evidence, Lean 4 proof artifacts</p>
-      <p>02</p>
-      <h2>Generation time</h2>
-      <p>At production</p>
-      <p>2.1</p>
-      <p>Normalize and bind the approved specification.</p>
-      <p>reproducible output</p>
-      <p>Evidence, normalized spec hash</p>
-      <p>2.2</p>
-      <p>Generate and compile the artifact.</p>
-      <p>Software is produced from a qualified grammar, then compiled, output is code that builds, not a suggestion to review.</p>
-      <p>Evidence, build record &amp; artifact hash</p>
-      <p>2.3</p>
-      <p>Run structural and semantic verification, then focused tests.</p>
-      <p>Each artifact is checked against structural and semantic expectations before it is eligible for deployment.</p>
-      <p>Evidence, verification &amp; test results</p>
-      <p>03</p>
-      <h2>Deployment time</h2>
-      <p>Before it goes live</p>
-      <p>3.1</p>
-      <p>Run the artifact in shadow execution.</p>
-      <p>no operational effect</p>
-      <p>Evidence, shadow execution log</p>
-      <p>3.2</p>
-      <p>Obtain policy and human-in-the-loop approval.</p>
-      <p>Promotion requires explicit policy checks and a human decision, accountability is recorded, not implicit.</p>
-      <p>Evidence, approval &amp; policy record</p>
-      <p>Deployment gate, promotion refused unless obligations are discharged</p>
-      <p>refuse promotion</p>
-      <p>3.3</p>
-      <p>Activate via blue-green cutover.</p>
-      <p>The new artifact takes traffic only after the gate clears, with the prior version held ready for instant reversion.</p>
-      <p>Evidence, deployment receipt</p>
-      <p>3.4</p>
-      <p>Monitor in production; roll back on deviation.</p>
-      <p>Operation is monitored continuously; any deviation triggers reversion to the last known-good version.</p>
-      <p>Evidence, monitoring &amp; rollback log</p>
-      <p>Determinism</p>
-      <h2>Every time.</h2>
-      <p>Unlike probabilistic code assistants that may generate different outputs from identical inputs, AssuredCode produces the same result every time from the same approved specification. Every generation is reproducible, auditable, and suitable for environments where consistency and accountability matter.</p>
-      <p>Probabilistic assistants</p>
-      <p>Same input, different output.</p>
-      <p>Non-reproducible. Every generation must be re-reviewed from scratch. Hard to audit, harder to certify.</p>
-      <p>AssuredCode</p>
-      <p>Same input, identical artifact.</p>
-      <p>Reproducible builds, traceable receipts, and proof obligations that must be discharged before promotion.</p>
-      <p>Key Capabilities</p>
+    <span class="eyebrow">Determinism</span>
+    <h2>Same spec. Same artifact. <em>Every time.</em></h2>
+    <p>Unlike probabilistic code assistants that may generate different outputs from identical inputs, AssuredCode produces the same result every time from the same approved specification. Every generation is reproducible, auditable, and suitable for environments where consistency and accountability matter.</p>
+    <div class="contrast">
+      <div class="bad">
+        <div class="label">Probabilistic assistants</div>
+        <div class="big">Same input, different output.</div>
+        <div class="sub">Non-reproducible. Every generation must be re-reviewed from scratch. Hard to audit, harder to certify.</div>
+      </div>
+      <div class="good">
+        <div class="label">AssuredCode</div>
+        <div class="big">Same input, identical artifact.</div>
+        <div class="sub">Reproducible builds, traceable receipts, and proof obligations that must be discharged before promotion.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Key Capabilities</span>
       <h2>Controlled generation, end to end.</h2>
-      <h2>Deterministic generation</h2>
-      <p>Generate software from approved specifications with reproducible outputs, enabling repeatable builds, validation, and compliance workflows.</p>
-      <h2>Specification-driven</h2>
-      <p>Software is generated from formal grammars, not free-form prompts. New languages and formats are added through grammar definitions, no foundation-model retraining.</p>
-      <h2>Governance &amp; auditability</h2>
-      <p>Every generation ships with traceable artifacts: specifications, generation history, validation results, deployment receipts, and audit records.</p>
-      <p>04</p>
-      <h2>Customer-controlled deployment</h2>
-      <p>Operates entirely within customer-controlled environments. No generated source code leaves the customer boundary unless explicitly configured.</p>
-      <p>05</p>
-      <h2>Enterprise validation</h2>
-      <p>Integrated syntax checking, specification verification, and dependency governance. Fault injection leaves proof obligations undischarged, so the deployment gate refuses promotion.</p>
-      <p>06</p>
-      <h2>Contextual knowledge sources</h2>
-      <p>Integrate vendor-managed knowledge, customer repositories, or internal RAG, with full control over data access and governance policy.</p>
-      <p>Benchmarking</p>
+    </div>
+    <div class="cap-grid">
+      <div class="cap">
+        <div class="n">01</div>
+        <h3>Deterministic generation</h3>
+        <p>Generate software from approved specifications with reproducible outputs — enabling repeatable builds, validation, and compliance workflows.</p>
+      </div>
+      <div class="cap">
+        <div class="n">02</div>
+        <h3>Specification-driven</h3>
+        <p>Software is generated from formal grammars, not free-form prompts. New languages and formats are added through grammar definitions — no foundation-model retraining.</p>
+      </div>
+      <div class="cap">
+        <div class="n">03</div>
+        <h3>Governance &amp; auditability</h3>
+        <p>Every generation ships with traceable artifacts: specifications, generation history, validation results, deployment receipts, and audit records.</p>
+      </div>
+      <div class="cap">
+        <div class="n">04</div>
+        <h3>Customer-controlled deployment</h3>
+        <p>Operates entirely within customer-controlled environments. No generated source code leaves the customer boundary unless explicitly configured.</p>
+      </div>
+      <div class="cap">
+        <div class="n">05</div>
+        <h3>Enterprise validation</h3>
+        <p>Integrated syntax checking, specification verification, and dependency governance. Fault injection leaves proof obligations undischarged — so the deployment gate refuses promotion.</p>
+      </div>
+      <div class="cap">
+        <div class="n">06</div>
+        <h3>Contextual knowledge sources</h3>
+        <p>Integrate vendor-managed knowledge, customer repositories, or internal RAG — with full control over data access and governance policy.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="bench block" id="bench">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Benchmarking</span>
       <h2>Measured on bare metal. Energy accounted for.</h2>
       <p>Benchmarks were performed on IBM Cloud bare metal, with energy measured directly via RAPL. The suite generated, compiled, and tested code across Python, C, and Java.</p>
-      <p>Validation Harness, 5 runs, multi-language</p>
-      <p>879 PASSED</p>
-      <p>Mean suite time</p>
-      <p>Energy / passing test</p>
-      <p>kJ</p>
-      <p>Incremental pkg energy</p>
-      <p>Total-energy variation</p>
-      <p>significant energy savings versus LLM code generation</p>
-      <p>AssuredCode-C</p>
-      <p>0.5 ms per generation</p>
-      <h2>Ideal use cases</h2>
-      <ul><li>001</li><li>002</li><li>003</li><li>004</li><li>005</li><li>006</li><li>007</li><li>008</li></ul>
-      <h2>Benefits</h2>
+    </div>
+    <div class="readout">
+      <div class="readout-bar"><span>Validation Harness · 5 runs · multi-language</span><span><b>879 PASSED</b> · 1 SKIP</span></div>
+      <div class="metrics">
+        <div class="metric"><div class="v">34.079<small>s</small></div><div class="l">Mean suite time</div></div>
+        <div class="metric"><div class="v">2.19<small>J</small></div><div class="l">Energy / passing test</div></div>
+        <div class="metric"><div class="v">1.927<small>kJ</small></div><div class="l">Incremental pkg energy</div></div>
+        <div class="metric"><div class="v">0.71<small>%</small></div><div class="l">Total-energy variation</div></div>
+      </div>
+    </div>
+    <p class="bench-note">Code was not only generated but compiled and tested — with <b>significant energy savings versus LLM code generation</b>. A highly optimized variant, <b>AssuredCode-C</b>, generates bare-metal C at under <b>0.5&nbsp;ms per generation</b>, purpose-built for autonomous, high-tempo deployment.</p>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap two">
+    <div class="list">
+      <h3>Ideal use cases</h3>
+      <ul>
+        <li><span>001</span>Regulated software development</li>
+        <li><span>002</span>Autonomous military systems</li>
+        <li><span>003</span>Financial services</li>
+        <li><span>004</span>Healthcare systems</li>
+        <li><span>005</span>Government &amp; defense</li>
+        <li><span>006</span>Enterprise integration projects</li>
+        <li><span>007</span>Legacy modernization</li>
+        <li><span>008</span>Controlled code-generation environments</li>
+      </ul>
+    </div>
+    <div class="list">
+      <h3>Benefits</h3>
+      <ul>
+        <li><span>+</span>Reproducible results</li>
+        <li><span>+</span>Reduced validation effort</li>
+        <li><span>+</span>Improved software quality</li>
+        <li><span>+</span>Full auditability</li>
+        <li><span>+</span>Reduced governance risk</li>
+        <li><span>+</span>Customer-controlled deployment</li>
+        <li><span>+</span>No dependence on externally generated source</li>
+      </ul>
     </div>
   </div>
 </section>
 
-<footer class="site-footer">
-  <div class="wrap">
-    <div class="foot-grid">
-      <div>
-        <h4>Autonomic AI, LLC</h4>
-        <p>Microsoft and IBM Partner. Enterprise and research-focused software. No sale of personal information.</p>
-        <p class="badge-line">Formally verified in Lean 4 &#10003; &nbsp; Published on Zenodo &#10003;</p>
-        <p class="badge-line">UEI: YAYREBPA5DP8 &nbsp; CAGE: 202Z5 &nbsp; Registered in SAM.gov</p>
-      </div>
-      <div>
-        <h4>Products</h4>
-        <div class="foot-links">
-          <a href="assured.html">AssuredCode</a>
-          <a href="assuredcode-c.html">AssuredCode-C</a>
-          <a href="assuredprocess.html">AssuredProcess</a>
-          <a href="assured-test.html">AssuredTest</a>
-          <a href="lop.html">LOP</a>
-          <a href="autonomous-systems.html">Autonomous Support</a>
-        </div>
-      </div>
-      <div>
-        <h4>Company</h4>
-        <div class="foot-links">
-          <a href="about.html">About</a>
-          <a href="capabilities.html">Capabilities</a>
-          <a href="functor.html">Functor Models</a>
-          <a href="customers.html">Customers</a>
-          <a href="projects.html">Projects</a>
-          <a href="press-release.html">Press</a>
-          <a href="terms.html">Terms</a>
-          <a href="privacy.html">Privacy</a>
-        </div>
-      </div>
-    </div>
-    <div class="foot-bottom">&copy; 2026 Autonomic AI, LLC. All rights reserved.</div>
-  </div>
-</footer>
+<script>
+  // Signature: reveal the three deterministic runs in sequence on load.
+  const runs = document.querySelectorAll('#runs .run');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduce){ runs.forEach(r=>r.classList.add('show')); }
+  else{
+    runs.forEach((r,i)=>setTimeout(()=>r.classList.add('show'), 500 + i*550));
+  }
 
+  // Operator / Assessor toggle — expands the assurance layer only; steps stay visible.
+  const proc = document.getElementById('proc');
+  document.querySelectorAll('#procToggle button').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('#procToggle button').forEach(b=>{
+        b.classList.remove('on'); b.setAttribute('aria-pressed','false');
+      });
+      btn.classList.add('on'); btn.setAttribute('aria-pressed','true');
+      proc.classList.toggle('show-assurance', btn.dataset.mode==='assessor');
+    });
+  });
+</script>
 </body>
 </html>
