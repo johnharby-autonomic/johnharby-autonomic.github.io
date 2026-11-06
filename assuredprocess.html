@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AssuredProcess | Autonomic AI, LLC</title>
+<meta name="description" content="Deterministic code generation self-contained secure">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap nav">
+    <a class="brand" href="index.html">Autonomic AI</a>
+    <button class="nav-toggle" aria-label="Menu" onclick="document.getElementById('nav').classList.toggle('open')">&#9776;</button>
+    <nav class="nav-links" id="nav">
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="capabilities.html">Capabilities</a>
+      <a href="assured.html">AssuredCode</a>
+      <a href="functor.html">Functor Models</a>
+      <a href="lop.html">LOP</a>
+      <a href="customers.html">Customers</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <h1>Assured Process (tm)</h1>
+    
+  </div>
+</section>
+
+<section class="content">
+  <div class="wrap">
+    <div class="prose">
+      <h2>Safe deterministic software generation, governance, and assurance.</h2>
+      <p>AssuredCode</p>
+      <p>AssuredCode-C</p>
+      <p>AssuredCode is a deterministic software generation platform that transforms formal specifications into production-ready software artifacts with full traceability, auditability, and governance. AssuredCode extends deterministic code generation beyond conventional build-time static generation by treating qualified implementation families as an executable generation space. AssuredCode-C applies this approach to constrained low-level C environments and can support both build-time generation and governed programmatic generation in operational systems.</p>
+      <h2>Safety</h2>
+      <p>Three different timescales of assurance:</p>
+      <p>Design time:</p>
+      <p>Generation time:</p>
+      <p>Deployment time:</p>
+      <p>Figure 1 - Template Certification</p>
+      <p>Figure 1 shows the offline process for creating specification templates. Subject matter experts (SMEs) analyze the need for dynamic support witn in the specifications for the device/vehicle itself. Analysis of QA also determines which outcomes of specs formed from this template can be deduced from the outcome of others. If mathematical eliminations are found, this reduces the overall effort.</p>
+      <p>After forming a spec template candidate the process enters a simulation phase which will run many simulations on the spec template using a calculated set of values to certify. When QA certifies the spec template it can be stored in the template repository. What we are seeking and frequently can find is the capability of claiming observations during realtime have already been tested offline.</p>
+      <p>The template repository as shown here represents the global collection of spec templates. For mission purposes a subset will be chosen and reviewed for that mission, for example robotic factory support would not require the spec templates certified for autonomous fire fighting. On completion of the mission the spec templates are reviewed prior to selection to assure that they are still sufficient. Human in control (HITC) and in the loop (HITL) at the template repository level is essential.</p>
+      <p>Simulation seems like a very large exhaustive run of cases. However many can be mathematically or scientifically eliminated. Case in point, an airplane with autopilot where we wish capability to change altitude, direction and velocity</p>
+      <p>Unlike probabilistic code assistants that may generate different outputs from identical inputs, AssuredCode is designed to produce the same result every time from the same approved specification. Every generation is reproducible, auditable, and suitable for environments where consistency and accountability matter.</p>
+      <p>AssuredCode moves much of software assurance ahead of operational generation by constraining and qualifying the space from which software can be produced, then adds generation-time and deployment-time verification before the artifact becomes operational. Figure 2 shows the AssuredCode deployment pipeline and Figure 3 shows the overall Assured Process:</p>
+      <p>Figure 2 - Deployment Pipeline</p>
+      <p>Figure 3 - The Overall Assured Process</p>
+      <h2>Spec Template Repair</h2>
+      <p>Figure 4 below shows the spec template cycle. A specification is prepared, simulation values are also specified and the simulations are run. Should a template fail it is placed on a queue for human or AI review depending on the customer preference. If it is decided to attempt repair this is done then the template is again submitted. On success it is stored in the template repository. If an error cannot be fixed the template is sent to a rejection queue.</p>
+      <p>Figure 4 - Specification Template Repair</p>
+      <h2>Benchmarking</h2>
+      <p>Benchmarks were performed on IBM Cloud bare metal so energy usage could be determined using RAPL. The test suite included code generation for multiple languages such as Python, C and Java - Across five runs, the AssuredCode Validation Harness completed 879 passing tests with one expected skip in a mean measured time of 34.079 seconds. Mean package energy was 6.552 kJ, with estimated incremental package energy of 1.927 kJ above idle, equivalent to approximately 2.19 J per passing test. Total-energy variation across runs was 0.71%. Code was not only generated but compiled and tested. Energy savings versus LLM code generation are significant. AssuredCode can operate well in the offloading LLM scenario where the LLM plays the role of an analyst conversing with the engineer then submitting specs to AssuredCode. See Figures 1 and 2 below.</p>
+      <h2>Key Capabilities</h2>
+      <ul><li>Deterministic Generation</li><li>Specification-Driven Development</li><li>Software is generated from formal grammars and specifications rather than free-form prompts. New languages and formats can be added through grammar definitions without retraining foundation models.</li><li>Governance and Auditability</li><li>Every generation is accompanied by traceable artifacts including specifications, generation history, validation results, deployment receipts, and audit records.</li><li>Customer-Controlled Deployment</li><li>AssuredCode can operate entirely within customer-controlled environments. No generated source code must leave the customer boundary unless explicitly configured to do so.</li><li>Enterprise Validation</li><li>Integrated validation workflows support syntax checking, specification verification, dependency governance, and deployment approval processes. Fault injection causes proof obligations to remain undischarged. The deployment gate therefore refuses promotion, leaving the active partition unchanged.</li></ul>
+      <h2>Architecture</h2>
+      <p>AssuredCode combines formal specifications, grammar-driven generation, deterministic transformation engines, and governed deployment workflows to provide a controlled alternative to traditional AI code generation.</p>
+      <p>Organizations can integrate vendor-managed knowledge sources, customer-managed repositories, or internal RAG systems to provide contextual awareness while maintaining control over data access and governance policies.</p>
+      <p>Ideal Use Cases</p>
+      <ul><li>Regulated software development</li><li>Autonomous Military Systems</li><li>Financial services</li><li>Healthcare systems</li><li>Government and defense</li><li>Enterprise integration projects</li><li>Legacy modernization</li><li>Specification-driven development</li><li>Controlled code generation environments</li></ul>
+      <p>Benefits</p>
+      <ul><li>Reproducible results</li><li>LLM integration optional</li><li>Maximal Simulation Coverage</li><li>Reduced validation effort</li><li>Improved software quality</li><li>Full Auditability</li><li>Full Transparency</li><li>Provenance support</li><li>Reduced governance risk</li><li>Customer-controlled deployment</li><li>No dependence on externally generated source code</li><li>Mathematical Verification</li><li>Fallback/Failover support inherent</li></ul>
+      <h2>Usage</h2>
+      <p>Figures 5 and 6 show two different usage flows. Figure 5 shows LLM integration. Here the LLM serves as an analyst/orchestrator rather than generating code itself. It can assist in evaluating the code generated by AssuredCode and as the analyst can partition larger project coding tasks into modules for AssuredCode to generate and finally render or submit to a pipeline the completed code. This has been successfully tested with AWS Kiro and the AssuredMCP server is available for this purpose.</p>
+      <p>Figure 5</p>
+      <p>Raw specification submission is possible as well but the template repository creates institutional structure that raw specification submission does not. A template can embody the organization, s approved constraints, interfaces, ranges, dependencies, security requirements, review requirements, and deployment policies. Individual generations then supply the variable bindings. In the world of automation, the company will want a direct, clear way to know what exactly is going on. Best practices will mandate the template repository or a similar solution.</p>
+      <p>Figure 6</p>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <h4>Autonomic AI, LLC</h4>
+        <p>Microsoft and IBM Partner. Enterprise and research-focused software. No sale of personal information.</p>
+        <p class="badge-line">Formally verified in Lean 4 &#10003; &nbsp; Published on Zenodo &#10003;</p>
+        <p class="badge-line">UEI: YAYREBPA5DP8 &nbsp; CAGE: 202Z5 &nbsp; Registered in SAM.gov</p>
+      </div>
+      <div>
+        <h4>Products</h4>
+        <div class="foot-links">
+          <a href="assured.html">AssuredCode</a>
+          <a href="assuredcode-c.html">AssuredCode-C</a>
+          <a href="assuredprocess.html">AssuredProcess</a>
+          <a href="assured-test.html">AssuredTest</a>
+          <a href="lop.html">LOP</a>
+          <a href="autonomous-systems.html">Autonomous Support</a>
+        </div>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <div class="foot-links">
+          <a href="about.html">About</a>
+          <a href="capabilities.html">Capabilities</a>
+          <a href="functor.html">Functor Models</a>
+          <a href="customers.html">Customers</a>
+          <a href="projects.html">Projects</a>
+          <a href="press-release.html">Press</a>
+          <a href="terms.html">Terms</a>
+          <a href="privacy.html">Privacy</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">&copy; 2026 Autonomic AI, LLC. All rights reserved.</div>
+  </div>
+</footer>
+
+</body>
+</html>
