@@ -231,6 +231,17 @@
     .run{opacity:1;transform:none;transition:none}
     *{scroll-behavior:auto}
   }
+  /* ---- FOOTER ---- */
+  .site-footer{border-top:1px solid var(--line-soft);background:var(--ink-2);padding:64px 0 40px;margin-top:0}
+  .foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:48px}
+  @media(max-width:760px){.foot-grid{grid-template-columns:1fr;gap:36px}}
+  .site-footer h4{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:16px}
+  .site-footer p{color:var(--muted);font-size:14px;margin-bottom:10px;max-width:46ch}
+  .badge-line{font-family:var(--mono);font-size:12px;color:var(--muted-2);letter-spacing:.03em}
+  .foot-links{display:flex;flex-direction:column;gap:10px}
+  .foot-links a{font-size:14px;color:var(--text);transition:color .2s}
+  .foot-links a:hover{color:var(--gold-bright)}
+  .foot-bottom{margin-top:48px;padding-top:24px;border-top:1px solid var(--line-soft);font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:var(--muted-2)}
 </style>
 </head>
 <body>
@@ -516,7 +527,7 @@
     <div class="foot-grid">
       <div>
         <h4>Autonomic AI, LLC</h4>
-        <p>Microsoft and IBM Partner. Enterprise and research-focused software. No sale of personal information.</p>
+        <p>AWS, Microsoft and IBM Partner. Enterprise and research-focused software. No sale of personal information.</p>
         <p class="badge-line">Formally verified in Lean 4 &#10003; &nbsp; Published on Zenodo &#10003;</p>
         <p class="badge-line">UEI: YAYREBPA5DP8 &nbsp; CAGE: 202Z5 &nbsp; Registered in SAM.gov</p>
       </div>
