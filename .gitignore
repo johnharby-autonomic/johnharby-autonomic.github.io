@@ -1,0 +1,52 @@
+__pycache__/
+*.pyc
+*.sh
+!scripts/release_checkpoint.sh
+*.zip
+.DS_Store
+.git
+.vscode
+transformation_demo_results.json
+transformation_module.py
+release/
+util/AssuredMCP_old
+
+# Generated runtime/demo/evidence artifacts
+
+artifacts/
+
+# Local secrets/env
+
+.env
+
+*.env
+
+.env.*
+
+# Generated local signing keys
+
+keys/
+
+# Python cache/test cache
+
+__pycache__/
+
+*.py[cod]
+
+.pytest_cache/
+
+.mypy_cache/
+
+.ruff_cache/
+
+# Local DB / temp outputs
+
+*.sqlite
+*.db
+
+tmp/
+
+temp/
+
+# Local pytest external dependency skip audit
+artifacts/external_dependency_test_audit.json
