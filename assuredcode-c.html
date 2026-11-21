@@ -42,9 +42,10 @@
       <p>LLM code generation has improved dramatically over the past year and is well suited to a wide range of tasks. AssuredCode-C does not compete with LLMs. As has long been the case in software, embedded applications form their own category. Lower-level work such as device drivers, and code generation invoked programmatically inside an automated pipeline carries requirements that general-purpose generation does not:</p>
       <ul><li>Reproducibility. Under automation, the same specification must always produce the same code. LLMs can return different output for identical input; when a generator runs &quot;under the hood&quot; as part of a build or deployment pipeline, that variability is a risk rather than a feature.</li><li>Provenance. LLMs are trained on large external datasets, so an artifact&#x27;s lineage traces back through that training data rather than to a specific, controlled specification. AssuredCode-C generates from a controlled specification through a governed pipeline, giving a direct, auditable path from specification to generated artifact, the kind of traceability high-assurance and regulated programs require.</li><li>Determinism. LLM generation is probabilistic. For low-level, automated code generation, deterministic methods are preferable and for safety-critical systems they are often mandatory. AssuredCode-C is built to be deterministic by design, not probabilistic with review after the fact.</li></ul>
       <h2>Console Demo</h2>
-      <p>Below is a demo of a suggested compliance console for the AssuredCode-C deployment pipeline. Clicking &quot;RUN CYCLE&quot; shows the success path and &quot;INJECT FAULT&quot; will cause the deployment to fail.</p>
+      <p>Below is a link to a suggested compliance console for the AssuredCode-C deployment pipeline. Clicking &quot;RUN CYCLE&quot; shows the success path and &quot;INJECT FAULT&quot; will cause the deployment to fail.</p>
+      <a href="console_demo.html">Console Demo</a><br>
       <h2>Generator Demo</h2>
-      <p>provenance</p>
+      <p>Below is a screenshot from a live demo that is available under NDA as AssuredCode-C is patent pending. Note of significance here is the toolbar above the generated code. This shows provenance. Each step is explained so there is no question to the origin of the generated code.</p>
     </div>
   </div>
 </section>

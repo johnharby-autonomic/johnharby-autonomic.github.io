@@ -80,6 +80,10 @@ section.block.alt{background:var(--bg-alt)}
 .content .prose h2{margin-top:1.6em}
 .content .prose ul{color:var(--ink-soft);padding-left:1.2em}
 .content .prose li{margin-bottom:.4em}
+.content .prose img{max-width:100%;height:auto;display:block;border-radius:var(--radius);border:1px solid var(--line);margin:1.25em 0}
+.figure{margin:1.5em 0}
+.figure img{margin:0}
+.figure figcaption{font-size:.9rem;color:var(--ink-soft);margin-top:.5em;text-align:center}
 
 /* Footer */
 .site-footer{background:#0a0e18;color:var(--ink-soft);padding:48px 0 32px;font-size:.92rem;border-top:1px solid var(--line)}
