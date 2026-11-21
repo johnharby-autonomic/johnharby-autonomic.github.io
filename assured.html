@@ -242,9 +242,41 @@
   .foot-links a{font-size:14px;color:var(--text);transition:color .2s}
   .foot-links a:hover{color:var(--gold-bright)}
   .foot-bottom{margin-top:48px;padding-top:24px;border-top:1px solid var(--line-soft);font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:var(--muted-2)}
+  /* ---- HEADER / NAV ---- */
+  .site-header{position:sticky;top:0;z-index:50;background:rgba(13,18,32,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--line-soft)}
+  .nav{display:flex;align-items:center;justify-content:space-between;gap:16px;height:64px}
+  .brand{font-family:var(--serif);font-weight:600;font-size:18px;color:var(--bone);letter-spacing:-.01em}
+  .brand:hover{color:var(--gold-bright)}
+  .nav-links{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+  .nav-links a{font-family:var(--mono);font-size:12.5px;letter-spacing:.02em;color:var(--muted);padding:8px 12px;transition:all .2s}
+  .nav-links a:hover{color:var(--gold-bright)}
+  .nav-links a.active{color:var(--gold)}
+  .nav-toggle{display:none;background:none;border:1px solid var(--line);padding:8px 10px;font-size:16px;color:var(--text);cursor:pointer}
+  @media(max-width:860px){
+    .nav-links{display:none;position:absolute;top:64px;left:0;right:0;flex-direction:column;background:var(--ink-2);border-bottom:1px solid var(--line-soft);padding:12px 24px;gap:2px}
+    .nav-links.open{display:flex}
+    .nav-links a{padding:10px 8px;width:100%}
+    .nav-toggle{display:block}
+  }
 </style>
 </head>
 <body>
+<header class="site-header">
+  <div class="wrap nav">
+    <a class="brand" href="index.html">Autonomic AI</a>
+    <button class="nav-toggle" aria-label="Menu" onclick="document.getElementById('nav').classList.toggle('open')">&#9776;</button>
+    <nav class="nav-links" id="nav">
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="capabilities.html">Capabilities</a>
+      <a href="assuredcode-c.html">AssuredCode-C</a>
+      <a href="assured.html" class="active">AssuredCode</a>
+      <a href="functor.html">Functor Models</a>
+      <a href="lop.html">LOP</a>
+      <a href="customers.html">Customers</a>
+    </nav>
+  </div>
+</header>
 <header class="hero">
   <div class="grid-bg"></div>
   <div class="wrap hero-grid">
